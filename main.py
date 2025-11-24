@@ -29,7 +29,9 @@ def create_app() -> FastAPI:
         scheduler.add_job(get_control, 'cron', minute='1-59/5')  # 매시간 1분부터 5분주기로 실행      
         scheduler.add_job(get_risk, 'cron', minute=40)  # 매시간 40분에 실행
         scheduler.add_job(get_risk_m, 'cron', minute='4-59/5')  # 매시간 4분부터 5분주기로 실행          
-
+        # print("🔍 테스트: 함수 직접 실행 시작")
+        # get_control() 
+        # print("🔍 테스트: 함수 직접 실행 종료")
         scheduler.start()                                        
         print("✅ 스케줄러 시작!")
 

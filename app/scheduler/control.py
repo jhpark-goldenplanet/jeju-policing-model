@@ -16,24 +16,29 @@ model_path = '/app/pkl/LightGBM_250226.pkl'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # scheduler.py의 디렉터리
 MODEL_PATH = os.path.join(BASE_DIR, '..', 'pkl', 'LightGBM_tunning_250819.pkl')
 #MODEL_PATH = os.path.join(BASE_DIR, '..', 'pkl', 'LightGBM_SMOTE.pkl')
-
+snow = "null"
 def get_control():
     import warnings
     warnings.filterwarnings('ignore')
+    
+    global snow
 
     check_query = text("select count(*) from info_control_model where reg_date = (select reg_date from info_rwis where latitude = '33.38483693' order by reg_date desc limit 1)")
-    query = text("select * from info_rwis where reg_date is not null and latitude = '33.38483693' order by reg_date desc limit 1")    
-    snowcover_query = text("select snowcover from sensor_data_jeju order by create_time desc limit 1")
-    snow = 0
-
+    query = text("select * from info_rwis where reg_date is not null and latitude = '33.38483693' order by reg_date desc limit 1")   
+    # senser data 적설량 추가
+    snowcover_query = text("select snowcover from sensor_data_snowcover order by create_time desc limit 1")
+    # snowcover_query = text("select snowcover from sensor_data_jeju order by create_time desc limit 1")
+    # snow = snow if snow == "null" else 0 
     engine_mariadb = create_engine(DATABASE_URL2, pool_pre_ping=True)
     with engine_mariadb.begin() as conn:
         snow = conn.execute(snowcover_query).scalar()        
-        snow = snow if snow is "null" else 0
-        if snow == "null":
+        # snow = snow if snow == "null" else 0
+        if snow is None or snow == "null":
+        # if snow == "null":
             snow = 0
         else:
             snow = int(snow)        
+        
 
     with engine.begin() as conn:
         check = conn.execute(check_query).scalar()
