@@ -90,6 +90,16 @@ def get_control():
 
 
 def get_add_data():
+
+    # 2025.12.03(pjh) 기존 int 형으로 들어오던 데이터가 새로운 text 형식으로 적용되어 controlL, controlS 해당 txt->int형변환 하드코딩
+    def convert_control_code(code):
+        if code == "TCS002":
+            return 1
+        elif code == "TCS003":
+            return 2
+        else:
+            return 0 # 기본값 또는 알 수 없는 코드
+
     # RSS 데이터 가져오기
     response = requests.get("https://www.jjpolice.go.kr/jjpolice/notice/traffic.htm?act=rss")
     response.raise_for_status()  # 요청 에러 체크
@@ -106,9 +116,12 @@ def get_add_data():
         
         if "5.16도로(1131)" in title:  # 제목 필터링
             freezing = item.find("freezing").text if item.find("freezing").text is not None else 0
-            controlL = item.find("controlL").text if item.find("controlL") is not None else 0
-            controlS = item.find("controlS").text if item.find("controlS") is not None else 0
-
+            controlL_text = item.find("contolL").text if item.find("contolL") is not None else None
+            controlS_text = item.find("contolS").text if item.find("contolS") is not None else None
+            
+            controlL = convert_control_code(controlL_text)
+            controlS = convert_control_code(controlS_text)
+            print(controlL)
             return freezing, controlL, controlS  # 데이터 반환
     
     return 0, 0, 0  # 해당 title이 없을 경우
