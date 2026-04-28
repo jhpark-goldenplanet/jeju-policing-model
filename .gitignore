@@ -1,5 +1,7 @@
 .venv/
 app/config/config.py
+app/scheduler/control_test.py
+
 
 # 파이썬 캐시 파일 무시
 __pycache__/
